@@ -8,7 +8,7 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 
-#define ID_JOIN_GAME 1001
+#define ID_JOIN_GAME 1001   
 #define IDC_PORT_INPUT 1002
 #define IDC_IP_INPUT 1003
 
