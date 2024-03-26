@@ -32,8 +32,6 @@ void GameWindow::Create(HWND parentWnd) {
     UpdateWindow(m_hWnd);
 }
 
-
-
 LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     GameWindow* pGameWindow;
 
@@ -59,12 +57,71 @@ LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT message, WPARAM wParam, 
             // Handle destruction
             PostQuitMessage(0);
             return 0;
-        default:
-            return DefWindowProc(hwnd, message, wParam, lParam);
+        case WM_KEYDOWN:
+            // Handle key down events (WASD for movement)
+            switch (wParam) {
+            case 'W':
+                // Move the circle up
+                pGameWindow->MoveCircle(0, -2);
+                InvalidateRect(hwnd, NULL, TRUE); // Request a repaint
+                break;
+            case 'A':
+                // Move the circle left
+                pGameWindow->MoveCircle(-2, 0);
+                InvalidateRect(hwnd, NULL, TRUE); // Request a repaint
+                break;
+            case 'S':
+                // Move the circle down
+                pGameWindow->MoveCircle(0, 2);
+                InvalidateRect(hwnd, NULL, TRUE); // Request a repaint
+                break;
+            case 'D':
+                // Move the circle right
+                pGameWindow->MoveCircle(2, 0);
+                InvalidateRect(hwnd, NULL, TRUE); // Request a repaint
+                break;
+            }
+            return 0;
         }
     }
 
     return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+//void GameWindow::MoveCircle(int dx, int dy) {
+//    // Update the position of the circle
+//    m_circleX += dx;
+//    m_circleY += dy;
+//
+//    // Request a repaint to refresh the window
+//    InvalidateRect(m_hWnd, NULL, TRUE);
+//}
+void GameWindow::MoveCircle(int dx, int dy) {
+    // Update the position of the circle
+    m_circleX += dx;
+    m_circleY += dy;
+
+    // Get the dimensions of the client area
+    RECT clientRect;
+    GetClientRect(m_hWnd, &clientRect);
+
+    // Adjust the circle position if it goes out of bounds
+    if (m_circleX < 20) {
+        m_circleX = 20;
+    }
+    else if (m_circleX > clientRect.right - 20) { // Adjust the value according to the circle size
+        m_circleX = clientRect.right - 20;
+    }
+
+    if (m_circleY < 20) {
+        m_circleY = 20;
+    }
+    else if (m_circleY > clientRect.bottom - 20) { // Adjust the value according to the circle size
+        m_circleY = clientRect.bottom - 20;
+    }
+
+    // Request a repaint to refresh the window
+    InvalidateRect(m_hWnd, NULL, TRUE);
 }
 
 
@@ -72,13 +129,20 @@ void GameWindow::DrawBall(HWND hwnd) {
     PAINTSTRUCT ps;
     HDC hdc = BeginPaint(hwnd, &ps);
 
-    // Draw a red ellipse (ball) at the center of the window
+    // Clear the drawing area by filling it with the background color (e.g., white)
+    HBRUSH hBackgroundBrush = CreateSolidBrush(RGB(255, 255, 255)); // White brush
+    RECT clientRect;
+    GetClientRect(hwnd, &clientRect);
+    FillRect(hdc, &clientRect, hBackgroundBrush);
+    DeleteObject(hBackgroundBrush);
+
+    // Draw a red ellipse (ball) at the specified position
     HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0)); // Red brush
     HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
-    int centerX = 200; // Center X coordinate
-    int centerY = 200; // Center Y coordinate
-    int radius = 50;   // Ball radius
+    int centerX = m_circleX; // Center X coordinate
+    int centerY = m_circleY; // Center Y coordinate
+    int radius = 20;   // Ball radius
 
     Ellipse(hdc, centerX - radius, centerY - radius, centerX + radius, centerY + radius);
 
