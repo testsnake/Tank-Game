@@ -133,6 +133,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameWindow.cpp" />
+    <ClCompile Include="GameWindow.h" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>

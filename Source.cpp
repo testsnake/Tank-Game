@@ -1,8 +1,10 @@
+// Source.cpp
 #include <Windows.h>
 #include <windows.h>
 #include <d2d1.h>
 #include <dwrite.h>
 #include <string>
+#include "GameWindow.h"
 
 // Link with d2d1.lib and dwrite.lib
 #pragma comment(lib, "d2d1.lib")
@@ -18,6 +20,8 @@ ID2D1Factory* pD2DFactory = NULL;
 IDWriteFactory* pDWriteFactory = NULL;
 IDWriteTextFormat* pTextFormat = NULL;
 ID2D1HwndRenderTarget* pRT = NULL; // Declare pRT here
+
+GameWindow* pGameWindow = nullptr;
 
 // Variables to store IP and port
 std::wstring ipAddress;
@@ -109,7 +113,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
     return 0;
 }
 
-// Initialize Direct2D
+// Initialize Direct2D 
 void InitializeDirect2D(HWND hwnd) {
     D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pD2DFactory);
 
@@ -281,10 +285,20 @@ void OnJoinGame(HWND hwnd) {
 
     // Output IP address and port (for demonstration)
     MessageBox(hwnd, (ipAddress + L":" + port).c_str(), L"Connection Info", MB_OK);
+
+
+    if (pGameWindow == nullptr) {
+        // Create the JoinGameWindow instance and pass IP and port
+        pGameWindow = new GameWindow(ipAddress, port);
+        pGameWindow->Create(hwnd);
+    }
+
 }
 
 // Cleanup resources
 void Cleanup() {
+    delete pGameWindow; // Release the allocated memory
+    pGameWindow = nullptr;
     SafeRelease(reinterpret_cast<IUnknown**>(&pTextFormat));
     SafeRelease(reinterpret_cast<IUnknown**>(&pDWriteFactory));
     SafeRelease(reinterpret_cast<IUnknown**>(&pRT));
